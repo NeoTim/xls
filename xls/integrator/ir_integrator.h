@@ -21,6 +21,56 @@
 
 namespace xls {
 
+class IntegrationFunction {
+ public:
+  IntegrationFunction() {}
+
+  // Create an IntegrationFunction object that is empty expect for
+  // paramters.
+  static absl::StatusOr<std::unique_ptr<IntegrationFunction>>
+  MakeIntegrationFunctionWithParamTuples(
+      Package* package, absl::Span<const Function* const> source_functions);
+
+  Function* function() const { return function_.get(); }
+
+  absl::StatusOr<Node*> MergeNodes(const Node* node_a, const Node* node_b);
+
+  // Declares that node 'source' from a source function maps
+  // to node 'map_target' in the integrated_function.
+  absl::Status SetNodeMapping(const Node* source, const Node* map_target);
+
+  // Returns the integrated node that 'original' maps to, if it
+  // exists. Otherwise, return an error status.
+  absl::StatusOr<const Node*> GetNodeMapping(const Node* original);
+
+  // Returns the original nodes that map to 'map_target' in the integrated
+  // function.
+  absl::StatusOr<const absl::flat_hash_set<const Node*>*> GetNodesMappedToNode(
+      const Node* map_target);
+
+  // Returns true if 'node' is mapped to a node in the integrated function.
+  bool HasMapping(const Node* node);
+
+  // Returns true if other nodes map to 'node'
+  bool IsMappingTarget(const Node* node);
+
+  // Returns true if 'node' is in the integrated function.
+  bool IntegrationFunctionOwnsNode(const Node* node) {
+    return function_.get() == node->function();
+  }
+
+ private:
+  // Track mapping of original function nodes to integrated function nodes.
+  absl::flat_hash_map<const Node*, const Node*>
+      original_node_to_integrated_node_map_;
+  absl::flat_hash_map<const Node*, absl::flat_hash_set<const Node*>>
+      integrated_node_to_original_nodes_map_;
+
+  // Integrated function.
+  std::unique_ptr<Function> function_;
+  Package* package_;
+};
+
 class IntegrationBuilder {
  public:
   IntegrationBuilder(absl::Span<const Function* const> input_functions) {
@@ -31,10 +81,17 @@ class IntegrationBuilder {
   }
 
   Package* package() { return package_.get(); }
+  absl::Span<const Function* const> source_functions() const {
+    return source_functions_;
+  }
 
   // Produce an integrated function implementing all
   // all functions in source_functions_.
   absl::StatusOr<Function*> Build();
+
+  // Returns an empty function with a signature that
+  // packs source function parameters into separate tuples.
+  absl::StatusOr<Function*> GetNewFunctionStub();
 
  private:
   // Copy the source functions into a common package.
