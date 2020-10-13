@@ -33,8 +33,6 @@ class IntegrationFunction {
 
   Function* function() const { return function_.get(); }
 
-  absl::StatusOr<Node*> MergeNodes(const Node* node_a, const Node* node_b);
-
   // Declares that node 'source' from a source function maps
   // to node 'map_target' in the integrated_function.
   absl::Status SetNodeMapping(const Node* source, Node* map_target);
