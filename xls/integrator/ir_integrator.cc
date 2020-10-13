@@ -133,7 +133,7 @@ absl::StatusOr<std::vector<Node*>> IntegrationFunction::GetOperandMappings(const
     if(!HasMapping(operand)) {
       return absl::InternalError("GetOperandMappings for unmapped operand not yet implemented");
     } else {
-      XLS_ASSIGN_OR_RETURN(const Node* operand_map_target, GetNodeMapping(operand));
+      XLS_ASSIGN_OR_RETURN(Node* operand_map_target, GetNodeMapping(operand));
       operand_mappings.push_back(operand_map_target);
     }
   }
