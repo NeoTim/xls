@@ -41,27 +41,27 @@ class IntegrationFunction {
 
   // Returns the integrated node that 'original' maps to, if it
   // exists. Otherwise, return an error status.
-  absl::StatusOr<Node*> GetNodeMapping(const Node* original);
+  absl::StatusOr<Node*> GetNodeMapping(const Node* original) const;
 
   // Returns the original nodes that map to 'map_target' in the integrated
   // function.
   absl::StatusOr<const absl::flat_hash_set<const Node*>*> GetNodesMappedToNode(
-      const Node* map_target);
+      const Node* map_target) const;
 
   // Returns a vector of Nodes to which the operands of the non-integration node 'original' maps.
   // If an operand does not yet have a mapping, the operand is
   // temporarily mapped to a new parameter. Use of this temporary
   // will be replaced with the real mapping when it is set.
-  absl::StatusOr<std::vector<Node*>> GetOperandMappings(const Node* original);
+  absl::StatusOr<std::vector<Node*>> GetOperandMappings(const Node* original) const;
 
   // Returns true if 'node' is mapped to a node in the integrated function.
-  bool HasMapping(const Node* node);
+  bool HasMapping(const Node* node) const;
 
   // Returns true if other nodes map to 'node'
-  bool IsMappingTarget(const Node* node);
+  bool IsMappingTarget(const Node* node) const;
 
   // Returns true if 'node' is in the integrated function.
-  bool IntegrationFunctionOwnsNode(const Node* node) {
+  bool IntegrationFunctionOwnsNode(const Node* node) const {
     return function_.get() == node->function();
   }
 
