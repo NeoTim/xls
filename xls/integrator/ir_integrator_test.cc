@@ -431,5 +431,22 @@ TEST_F(IntegratorTest, ParamterPacking) {
   EXPECT_EQ(integration->function()->node_count(), 6);
 }
 
+TEST_F(IntegratorTest, GetOperandMappingsTest) {
+  auto p = CreatePackage();
+  FunctionBuilder fb_a("func_a", p.get());
+  auto a1 = fb_a.Param("a1", p->GetBitsType(2));
+  auto a2 = fb_a.Param("a2", p->GetBitsType(2));
+  fb_a.Add(a1, a2);
+  XLS_ASSERT_OK_AND_ASSIGN(Function * func_a, fb_a.Build());
+
+  XLS_ASSERT_OK_AND_ASSIGN(
+      std::unique_ptr<IntegrationFunction> integration,
+      std::move(IntegrationFunction::MakeIntegrationFunctionWithParamTuples(
+          p.get(), {func_a})));
+
+  Node* a1_node = func_a->GetNode("a1");
+  Node* a2_node = func_a->GetNode("a2");
+  Node* add_node = func_a->return_value();
+
 }  // namespace
 }  // namespace xls

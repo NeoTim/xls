@@ -125,6 +125,21 @@ IntegrationFunction::GetNodesMappedToNode(const Node* map_target) {
   return &integrated_node_to_original_nodes_map_.at(map_target);
 }
 
+absl::StatusOr<std::vector<Node*>> IntegrationFunction::GetOperandMappings(const Node* node) {
+  std::vector<Node*> operand_mappings;
+  operand_mappings.reserve(node->operands().size());
+
+  for(const auto* operand : node->operands()) {
+    if(!HasMapping(operand)) {
+      return absl::InternalError("GetOperandMappings for unmapped operand not yet implemented");
+    } else {
+      XLS_ASSIGN_OR_RETURN(const Node* operand_map_target, GetNodeMapping(operand));
+      operand_mappings.push_back(operand_map_target);
+    }
+  }
+  return operand_mappings;
+}
+
 bool IntegrationFunction::HasMapping(const Node* node) {
   return original_node_to_integrated_node_map_.contains(node);
 }

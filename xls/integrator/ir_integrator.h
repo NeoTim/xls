@@ -48,6 +48,12 @@ class IntegrationFunction {
   absl::StatusOr<const absl::flat_hash_set<const Node*>*> GetNodesMappedToNode(
       const Node* map_target);
 
+  // Returns a vector of Nodes to which the operands of 'node' maps.
+  // If an operand does not yet have a mapping, the operand is
+  // temporarily mapped to a new parameter. Use of this temporary
+  // will be replaced with the real mapping when it is set.
+  absl::StatusOr<std::vector<Node*>> GetOperandMappings(const Node* node);
+
   // Returns true if 'node' is mapped to a node in the integrated function.
   bool HasMapping(const Node* node);
 
