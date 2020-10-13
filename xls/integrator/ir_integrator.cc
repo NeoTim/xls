@@ -107,8 +107,8 @@ absl::Status IntegrationFunction::SetNodeMapping(const Node* source,
   return absl::OkStatus();
 }
 
-absl::StatusOr<const Node*> IntegrationFunction::GetNodeMapping(
-    Node* original) {
+absl::StatusOr<Node*> IntegrationFunction::GetNodeMapping(
+    const Node* original) {
   XLS_RET_CHECK(!IntegrationFunctionOwnsNode(original));
   if (!HasMapping(original)) {
     return absl::InternalError("No mapping found for original node");

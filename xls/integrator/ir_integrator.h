@@ -41,7 +41,7 @@ class IntegrationFunction {
 
   // Returns the integrated node that 'original' maps to, if it
   // exists. Otherwise, return an error status.
-  absl::StatusOr<const Node*> GetNodeMapping(Node* original);
+  absl::StatusOr<Node*> GetNodeMapping(const Node* original);
 
   // Returns the original nodes that map to 'map_target' in the integrated
   // function.
