@@ -66,7 +66,7 @@ IntegrationFunction::MakeIntegrationFunctionWithParamTuples(
 }
 
 absl::Status IntegrationFunction::SetNodeMapping(const Node* source,
-                                                 const Node* map_target) {
+                                                 Node* map_target) {
   // Validate map pairing.
   if (source == map_target) {
     return absl::InternalError("Tried to map a node to itself");
@@ -108,7 +108,7 @@ absl::Status IntegrationFunction::SetNodeMapping(const Node* source,
 }
 
 absl::StatusOr<const Node*> IntegrationFunction::GetNodeMapping(
-    const Node* original) {
+    Node* original) {
   XLS_RET_CHECK(!IntegrationFunctionOwnsNode(original));
   if (!HasMapping(original)) {
     return absl::InternalError("No mapping found for original node");

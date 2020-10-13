@@ -37,11 +37,11 @@ class IntegrationFunction {
 
   // Declares that node 'source' from a source function maps
   // to node 'map_target' in the integrated_function.
-  absl::Status SetNodeMapping(const Node* source, const Node* map_target);
+  absl::Status SetNodeMapping(const Node* source, Node* map_target);
 
   // Returns the integrated node that 'original' maps to, if it
   // exists. Otherwise, return an error status.
-  absl::StatusOr<const Node*> GetNodeMapping(const Node* original);
+  absl::StatusOr<const Node*> GetNodeMapping(Node* original);
 
   // Returns the original nodes that map to 'map_target' in the integrated
   // function.
@@ -61,7 +61,7 @@ class IntegrationFunction {
 
  private:
   // Track mapping of original function nodes to integrated function nodes.
-  absl::flat_hash_map<const Node*, const Node*>
+  absl::flat_hash_map<const Node*, Node*>
       original_node_to_integrated_node_map_;
   absl::flat_hash_map<const Node*, absl::flat_hash_set<const Node*>>
       integrated_node_to_original_nodes_map_;
