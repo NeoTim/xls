@@ -125,11 +125,12 @@ IntegrationFunction::GetNodesMappedToNode(const Node* map_target) {
   return &integrated_node_to_original_nodes_map_.at(map_target);
 }
 
-absl::StatusOr<std::vector<Node*>> IntegrationFunction::GetOperandMappings(const Node* node) {
+absl::StatusOr<std::vector<Node*>> IntegrationFunction::GetOperandMappings(const Node* original) {
+  XLS_RET_CHECK(!IntegrationFunctionOwnsNode(original));
   std::vector<Node*> operand_mappings;
-  operand_mappings.reserve(node->operands().size());
+  operand_mappings.reserve(original->operands().size());
 
-  for(const auto* operand : node->operands()) {
+  for(const auto* operand : original->operands()) {
     if(!HasMapping(operand)) {
       return absl::InternalError("GetOperandMappings for unmapped operand not yet implemented");
     } else {

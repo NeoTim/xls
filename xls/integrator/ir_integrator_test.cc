@@ -28,6 +28,7 @@ namespace xls {
 namespace {
 
 using status_testing::IsOkAndHolds;
+using ::testing::ElementsAre;
 using ::testing::UnorderedElementsAre;
 
 class IntegratorTest : public IrTestBase {};
@@ -431,7 +432,7 @@ TEST_F(IntegratorTest, ParamterPacking) {
   EXPECT_EQ(integration->function()->node_count(), 6);
 }
 
-TEST_F(IntegratorTest, GetOperandMappingsTest) {
+TEST_F(IntegratorTest, GetOperandMappingsSimple) {
   auto p = CreatePackage();
   FunctionBuilder fb_a("func_a", p.get());
   auto a1 = fb_a.Param("a1", p->GetBitsType(2));
@@ -444,9 +445,35 @@ TEST_F(IntegratorTest, GetOperandMappingsTest) {
       std::move(IntegrationFunction::MakeIntegrationFunctionWithParamTuples(
           p.get(), {func_a})));
 
-  Node* a1_node = func_a->GetNode("a1");
-  Node* a2_node = func_a->GetNode("a2");
+  XLS_ASSERT_OK_AND_ASSIGN(Node* a1_node, func_a->GetNode("a1"));
+  XLS_ASSERT_OK_AND_ASSIGN(Node* a2_node, func_a->GetNode("a2"));
   Node* add_node = func_a->return_value();
+
+  auto GetTupleIndexWithIndex = [&](long int index) {
+    for (Node* node : integration->function()->nodes()) {
+      if (node->op() == Op::kTupleIndex) {
+        TupleIndex* tuple_index = static_cast<TupleIndex*>(node);
+        if(tuple_index->index() == index) {
+          return absl::optional<Node*>(node);
+        }
+      }
+    }
+    return absl::optional<Node*>(std::nullopt);
+  };
+  auto a1_index = GetTupleIndexWithIndex(0);
+  EXPECT_TRUE(a1_index.has_value());
+  Node* a1_map_target = a1_index.value();
+  auto a2_index = GetTupleIndexWithIndex(1);
+  EXPECT_TRUE(a2_index.has_value());
+  Node* a2_map_target = a2_index.value();
+
+  XLS_ASSERT_OK(integration->SetNodeMapping(a1_node, a1_map_target));
+  XLS_ASSERT_OK(integration->SetNodeMapping(a2_node, a2_map_target));
+  XLS_ASSERT_OK_AND_ASSIGN(std::vector<Node*> operand_mappings, integration->GetOperandMappings(add_node));
+  EXPECT_THAT(operand_mappings, ElementsAre(a1_map_target, a2_map_target));
+
+  EXPECT_FALSE(integration->GetOperandMappings(a1_map_target).ok());
+}
 
 }  // namespace
 }  // namespace xls
